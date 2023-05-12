@@ -1,0 +1,1160 @@
+2023/05/11 10:19:33 - mmengine - INFO - 
+------------------------------------------------------------
+System environment:
+    sys.platform: linux
+    Python: 3.10.10 | packaged by conda-forge | (main, Mar 24 2023, 20:08:06) [GCC 11.3.0]
+    CUDA available: True
+    numpy_random_seed: 304
+    GPU 0: Tesla P100-PCIE-16GB
+    CUDA_HOME: /opt/conda
+    NVCC: Cuda compilation tools, release 12.1, V12.1.105
+    GCC: gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+    PyTorch: 1.12.0+cu113
+    PyTorch compiling details: PyTorch built with:
+  - GCC 9.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2020.0.0 Product Build 20191122 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.6.0 (Git Hash 52b5f107dd9cf10910aaa19cb47f3abf9b349815)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.3
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.3.2  (built against CUDA 11.5)
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.3, CUDNN_VERSION=8.3.2, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.12.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=OFF, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+    TorchVision: 0.15.1
+    OpenCV: 4.5.4
+    MMEngine: 0.7.3
+
+Runtime environment:
+    cudnn_benchmark: True
+    mp_cfg: {'mp_start_method': 'fork', 'opencv_num_threads': 0}
+    dist_cfg: {'backend': 'nccl'}
+    seed: 304
+    Distributed launcher: none
+    Distributed training: False
+    GPU number: 1
+------------------------------------------------------------
+
+2023/05/11 10:19:34 - mmengine - INFO - Config:
+dataset_type = 'ISICDataset'
+data_root = '/kaggle/input/isic-2018/data'
+img_scale = (2048, 1024)
+crop_size = (1024, 1024)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations'),
+    dict(type='ConvertPixel'),
+    dict(
+        type='RandomResize',
+        scale=(2048, 1024),
+        ratio_range=(0.5, 2.0),
+        keep_ratio=True),
+    dict(type='RandomCrop', crop_size=(512, 512), cat_max_ratio=0.75),
+    dict(type='RandomFlip', prob=0.5),
+    dict(type='PhotoMetricDistortion'),
+    dict(type='GenerateEdge', edge_width=4),
+    dict(type='PackSegInputs')
+]
+val_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='Resize', scale=(2048, 1024), keep_ratio=True),
+    dict(type='LoadAnnotations'),
+    dict(type='ConvertPixel'),
+    dict(type='PackSegInputs')
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='Resize', scale=(2048, 1024), keep_ratio=True),
+    dict(type='LoadAnnotations'),
+    dict(type='ConvertPixel'),
+    dict(type='PackSegInputs')
+]
+img_ratios = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75]
+tta_pipeline = [
+    dict(type='LoadImageFromFile', backend_args=None),
+    dict(
+        type='TestTimeAug',
+        transforms=[[{
+            'type': 'Resize',
+            'scale_factor': 0.5,
+            'keep_ratio': True
+        }, {
+            'type': 'Resize',
+            'scale_factor': 0.75,
+            'keep_ratio': True
+        }, {
+            'type': 'Resize',
+            'scale_factor': 1.0,
+            'keep_ratio': True
+        }, {
+            'type': 'Resize',
+            'scale_factor': 1.25,
+            'keep_ratio': True
+        }, {
+            'type': 'Resize',
+            'scale_factor': 1.5,
+            'keep_ratio': True
+        }, {
+            'type': 'Resize',
+            'scale_factor': 1.75,
+            'keep_ratio': True
+        }],
+                    [{
+                        'type': 'RandomFlip',
+                        'prob': 0.0,
+                        'direction': 'horizontal'
+                    }, {
+                        'type': 'RandomFlip',
+                        'prob': 1.0,
+                        'direction': 'horizontal'
+                    }], [{
+                        'type': 'LoadAnnotations'
+                    }], [{
+                        'type': 'PackSegInputs'
+                    }]])
+]
+train_dataloader = dict(
+    batch_size=4,
+    num_workers=4,
+    persistent_workers=True,
+    sampler=dict(type='InfiniteSampler', shuffle=True),
+    dataset=dict(
+        type='RepeatDataset',
+        times=40000,
+        dataset=dict(
+            type='ISICDataset',
+            data_root='/kaggle/input/isic-2018/data',
+            data_prefix=dict(
+                img_path='images/train', seg_map_path='annotations/train'),
+            pipeline=[
+                dict(type='LoadImageFromFile'),
+                dict(type='LoadAnnotations'),
+                dict(type='ConvertPixel'),
+                dict(
+                    type='RandomResize',
+                    scale=(2048, 1024),
+                    ratio_range=(0.5, 2.0),
+                    keep_ratio=True),
+                dict(
+                    type='RandomCrop',
+                    crop_size=(512, 512),
+                    cat_max_ratio=0.75),
+                dict(type='RandomFlip', prob=0.5),
+                dict(type='PhotoMetricDistortion'),
+                dict(type='GenerateEdge', edge_width=4),
+                dict(type='PackSegInputs')
+            ])))
+val_dataloader = dict(
+    batch_size=1,
+    num_workers=4,
+    persistent_workers=True,
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    dataset=dict(
+        type='ISICDataset',
+        data_root='/kaggle/input/isic-2018/data',
+        data_prefix=dict(
+            img_path='images/val', seg_map_path='annotations/val'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Resize', scale=(2048, 1024), keep_ratio=True),
+            dict(type='LoadAnnotations'),
+            dict(type='ConvertPixel'),
+            dict(type='PackSegInputs')
+        ]))
+test_dataloader = dict(
+    batch_size=1,
+    num_workers=4,
+    persistent_workers=True,
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    dataset=dict(
+        type='ISICDataset',
+        data_root='/kaggle/input/isic-2018/data',
+        data_prefix=dict(
+            img_path='images/test', seg_map_path='annotations/test'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Resize', scale=(2048, 1024), keep_ratio=True),
+            dict(type='LoadAnnotations'),
+            dict(type='ConvertPixel'),
+            dict(type='PackSegInputs')
+        ]))
+val_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'])
+test_evaluator = dict(
+    type='IoUMetric',
+    iou_metrics=['mIoU'],
+    format_only=True,
+    keep_results=True,
+    output_dir='/kaggle/working/test')
+default_scope = 'mmseg'
+env_cfg = dict(
+    cudnn_benchmark=True,
+    mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
+    dist_cfg=dict(backend='nccl'))
+vis_backends = [dict(type='LocalVisBackend')]
+visualizer = dict(
+    type='SegLocalVisualizer',
+    vis_backends=[dict(type='LocalVisBackend')],
+    name='visualizer')
+log_processor = dict(by_epoch=False)
+log_level = 'INFO'
+load_from = None
+resume = False
+tta_model = dict(type='SegTTAModel')
+class_weight = [1.0, 1.0]
+checkpoint_file = 'https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/pidnet/pidnet-s_imagenet1k_20230306-715e6273.pth'
+data_preprocessor = dict(
+    type='SegDataPreProcessor',
+    mean=[123.675, 116.28, 103.53],
+    std=[58.395, 57.12, 57.375],
+    bgr_to_rgb=True,
+    pad_val=0,
+    seg_pad_val=255,
+    size=(1024, 1024))
+norm_cfg = dict(type='SyncBN', requires_grad=True)
+model = dict(
+    type='EncoderDecoder',
+    data_preprocessor=dict(
+        type='SegDataPreProcessor',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        bgr_to_rgb=True,
+        pad_val=0,
+        seg_pad_val=255,
+        size=(1024, 1024)),
+    backbone=dict(
+        type='PIDNet',
+        in_channels=3,
+        channels=32,
+        ppm_channels=96,
+        num_stem_blocks=2,
+        num_branch_blocks=3,
+        align_corners=False,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        act_cfg=dict(type='ReLU', inplace=True),
+        init_cfg=dict(
+            type='Pretrained',
+            checkpoint=
+            'https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/pidnet/pidnet-s_imagenet1k_20230306-715e6273.pth'
+        )),
+    decode_head=dict(
+        type='PIDHead',
+        in_channels=128,
+        channels=128,
+        num_classes=2,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        act_cfg=dict(type='ReLU', inplace=True),
+        align_corners=False,
+        loss_decode=[
+            dict(
+                type='CrossEntropyLoss',
+                use_sigmoid=False,
+                class_weight=[1.0, 1.0],
+                loss_weight=0.4),
+            dict(
+                type='OhemCrossEntropy',
+                thres=0.9,
+                min_kept=131072,
+                class_weight=[1.0, 1.0],
+                loss_weight=1.0),
+            dict(type='BoundaryLoss', loss_weight=20.0),
+            dict(
+                type='OhemCrossEntropy',
+                thres=0.9,
+                min_kept=131072,
+                class_weight=[1.0, 1.0],
+                loss_weight=1.0)
+        ]),
+    train_cfg=dict(),
+    test_cfg=dict(mode='whole'))
+iters = 1500
+optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005)
+optim_wrapper = dict(
+    type='OptimWrapper',
+    optimizer=dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005),
+    clip_grad=None)
+param_scheduler = [
+    dict(
+        type='PolyLR', eta_min=0, power=0.9, begin=0, end=1500, by_epoch=False)
+]
+train_cfg = dict(type='IterBasedTrainLoop', max_iters=1500, val_interval=1500)
+val_cfg = dict(type='ValLoop')
+test_cfg = dict(type='TestLoop')
+default_hooks = dict(
+    timer=dict(type='IterTimerHook'),
+    logger=dict(type='LoggerHook', interval=50, log_metric_by_epoch=False),
+    param_scheduler=dict(type='ParamSchedulerHook'),
+    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=1500),
+    sampler_seed=dict(type='DistSamplerSeedHook'),
+    visualization=dict(type='SegVisualizationHook'))
+randomness = dict(seed=304)
+work_dir = '/kaggle/working/'
+
+2023/05/11 10:19:39 - mmengine - INFO - Distributed training is not used, all SyncBatchNorm (SyncBN) layers in the model will be automatically reverted to BatchNormXd layers if they are used.
+2023/05/11 10:19:39 - mmengine - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+before_train:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) DistSamplerSeedHook                
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) SegVisualizationHook               
+(BELOW_NORMAL) LoggerHook                         
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) IterTimerHook                      
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_val_epoch:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+before_val_iter:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) SegVisualizationHook               
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_val_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) LoggerHook                         
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+after_train:
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_test_epoch:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+before_test_iter:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_test_iter:
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) SegVisualizationHook               
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_test_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_run:
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+2023/05/11 10:20:02 - mmengine - WARNING - The prefix is not set in metric class IoUMetric.
+2023/05/11 10:20:08 - mmengine - INFO - Loads checkpoint by http backend from path: https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/pidnet/pidnet-s_imagenet1k_20230306-715e6273.pth
+Name of parameter - Initialization information
+
+backbone.stem.0.conv.weight - torch.Size([32, 3, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.0.bn.weight - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.0.bn.bias - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.1.conv.weight - torch.Size([32, 32, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.1.bn.weight - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.1.bn.bias - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.2.0.conv1.conv.weight - torch.Size([32, 32, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.2.0.conv1.bn.weight - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.2.0.conv1.bn.bias - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.2.0.conv2.conv.weight - torch.Size([32, 32, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.2.0.conv2.bn.weight - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.2.0.conv2.bn.bias - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.2.1.conv1.conv.weight - torch.Size([32, 32, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.2.1.conv1.bn.weight - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.2.1.conv1.bn.bias - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.2.1.conv2.conv.weight - torch.Size([32, 32, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.2.1.conv2.bn.weight - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.2.1.conv2.bn.bias - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.4.0.conv1.conv.weight - torch.Size([64, 32, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.4.0.conv1.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.4.0.conv1.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.4.0.conv2.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.4.0.conv2.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.4.0.conv2.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.4.0.downsample.conv.weight - torch.Size([64, 32, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.4.0.downsample.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.4.0.downsample.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.4.1.conv1.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.4.1.conv1.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.4.1.conv1.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.4.1.conv2.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.4.1.conv2.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.stem.4.1.conv2.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.0.conv1.conv.weight - torch.Size([128, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.0.conv1.bn.weight - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.0.conv1.bn.bias - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.0.conv2.conv.weight - torch.Size([128, 128, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.0.conv2.bn.weight - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.0.conv2.bn.bias - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.0.downsample.conv.weight - torch.Size([128, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.0.downsample.bn.weight - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.0.downsample.bn.bias - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.1.conv1.conv.weight - torch.Size([128, 128, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.1.conv1.bn.weight - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.1.conv1.bn.bias - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.1.conv2.conv.weight - torch.Size([128, 128, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.1.conv2.bn.weight - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.1.conv2.bn.bias - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.2.conv1.conv.weight - torch.Size([128, 128, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.2.conv1.bn.weight - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.2.conv1.bn.bias - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.2.conv2.conv.weight - torch.Size([128, 128, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.2.conv2.bn.weight - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.0.2.conv2.bn.bias - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.0.conv1.conv.weight - torch.Size([256, 128, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.0.conv1.bn.weight - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.0.conv1.bn.bias - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.0.conv2.conv.weight - torch.Size([256, 256, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.0.conv2.bn.weight - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.0.conv2.bn.bias - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.0.downsample.conv.weight - torch.Size([256, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.0.downsample.bn.weight - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.0.downsample.bn.bias - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.1.conv1.conv.weight - torch.Size([256, 256, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.1.conv1.bn.weight - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.1.conv1.bn.bias - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.1.conv2.conv.weight - torch.Size([256, 256, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.1.conv2.bn.weight - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.1.conv2.bn.bias - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.2.conv1.conv.weight - torch.Size([256, 256, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.2.conv1.bn.weight - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.2.conv1.bn.bias - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.2.conv2.conv.weight - torch.Size([256, 256, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.2.conv2.bn.weight - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.1.2.conv2.bn.bias - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.0.conv1.conv.weight - torch.Size([256, 256, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.0.conv1.bn.weight - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.0.conv1.bn.bias - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.0.conv2.conv.weight - torch.Size([256, 256, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.0.conv2.bn.weight - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.0.conv2.bn.bias - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.0.conv3.conv.weight - torch.Size([512, 256, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.0.conv3.bn.weight - torch.Size([512]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.0.conv3.bn.bias - torch.Size([512]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.0.downsample.conv.weight - torch.Size([512, 256, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.0.downsample.bn.weight - torch.Size([512]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.0.downsample.bn.bias - torch.Size([512]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.1.conv1.conv.weight - torch.Size([256, 512, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.1.conv1.bn.weight - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.1.conv1.bn.bias - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.1.conv2.conv.weight - torch.Size([256, 256, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.1.conv2.bn.weight - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.1.conv2.bn.bias - torch.Size([256]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.1.conv3.conv.weight - torch.Size([512, 256, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.1.conv3.bn.weight - torch.Size([512]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.i_branch_layers.2.1.conv3.bn.bias - torch.Size([512]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.0.0.conv1.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.0.0.conv1.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.0.0.conv1.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.0.0.conv2.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.0.0.conv2.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.0.0.conv2.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.0.1.conv1.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.0.1.conv1.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.0.1.conv1.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.0.1.conv2.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.0.1.conv2.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.0.1.conv2.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.1.0.conv1.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.1.0.conv1.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.1.0.conv1.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.1.0.conv2.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.1.0.conv2.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.1.0.conv2.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.1.1.conv1.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.1.1.conv1.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.1.1.conv1.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.1.1.conv2.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.1.1.conv2.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.1.1.conv2.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.2.0.conv1.conv.weight - torch.Size([64, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.2.0.conv1.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.2.0.conv1.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.2.0.conv2.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.2.0.conv2.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.2.0.conv2.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.2.0.conv3.conv.weight - torch.Size([128, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.2.0.conv3.bn.weight - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.2.0.conv3.bn.bias - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.2.0.downsample.conv.weight - torch.Size([128, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.2.0.downsample.bn.weight - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.p_branch_layers.2.0.downsample.bn.bias - torch.Size([128]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.compression_1.conv.weight - torch.Size([64, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.compression_1.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.compression_1.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.compression_2.conv.weight - torch.Size([64, 256, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.compression_2.bn.weight - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.compression_2.bn.bias - torch.Size([64]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.pag_1.f_i.conv.weight - torch.Size([32, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.pag_1.f_i.bn.weight - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.pag_1.f_i.bn.bias - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.pag_1.f_p.conv.weight - torch.Size([32, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.pag_1.f_p.bn.weight - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.pag_1.f_p.bn.bias - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.pag_2.f_i.conv.weight - torch.Size([32, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.pag_2.f_i.bn.weight - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.pag_2.f_i.bn.bias - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.pag_2.f_p.conv.weight - torch.Size([32, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.pag_2.f_p.bn.weight - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.pag_2.f_p.bn.bias - torch.Size([32]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.d_branch_layers.0.conv1.conv.weight - torch.Size([32, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.d_branch_layers.0.conv1.bn.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.0.conv1.bn.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.0.conv2.conv.weight - torch.Size([32, 32, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.d_branch_layers.0.conv2.bn.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.0.conv2.bn.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.0.downsample.conv.weight - torch.Size([32, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.d_branch_layers.0.downsample.bn.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.0.downsample.bn.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.1.0.conv1.conv.weight - torch.Size([32, 32, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.d_branch_layers.1.0.conv1.bn.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.1.0.conv1.bn.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.1.0.conv2.conv.weight - torch.Size([32, 32, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.d_branch_layers.1.0.conv2.bn.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.1.0.conv2.bn.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.1.0.conv3.conv.weight - torch.Size([64, 32, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.d_branch_layers.1.0.conv3.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.1.0.conv3.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.1.0.downsample.conv.weight - torch.Size([64, 32, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.d_branch_layers.1.0.downsample.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.1.0.downsample.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.2.0.conv1.conv.weight - torch.Size([64, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.d_branch_layers.2.0.conv1.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.2.0.conv1.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.2.0.conv2.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.d_branch_layers.2.0.conv2.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.2.0.conv2.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.2.0.conv3.conv.weight - torch.Size([128, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.d_branch_layers.2.0.conv3.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.2.0.conv3.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.2.0.downsample.conv.weight - torch.Size([128, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.d_branch_layers.2.0.downsample.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.d_branch_layers.2.0.downsample.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.diff_1.conv.weight - torch.Size([32, 128, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.diff_1.bn.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.diff_1.bn.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.diff_2.conv.weight - torch.Size([64, 256, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.diff_2.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.diff_2.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.spp.scales.0.conv.weight - torch.Size([96, 512, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.spp.scales.0.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.spp.scales.0.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.spp.scales.1.1.conv.weight - torch.Size([96, 512, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.spp.scales.1.1.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.spp.scales.1.1.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.spp.scales.2.1.conv.weight - torch.Size([96, 512, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.spp.scales.2.1.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.spp.scales.2.1.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.spp.scales.3.1.conv.weight - torch.Size([96, 512, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.spp.scales.3.1.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.spp.scales.3.1.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.spp.scales.4.1.conv.weight - torch.Size([96, 512, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.spp.scales.4.1.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.spp.scales.4.1.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.spp.processes.conv.weight - torch.Size([384, 96, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.spp.processes.bn.weight - torch.Size([384]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.spp.processes.bn.bias - torch.Size([384]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.spp.compression.conv.weight - torch.Size([128, 480, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.spp.compression.bn.weight - torch.Size([480]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.spp.compression.bn.bias - torch.Size([480]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.spp.shortcut.conv.weight - torch.Size([128, 512, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.spp.shortcut.bn.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.spp.shortcut.bn.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.dfm.f_p.conv.weight - torch.Size([128, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.dfm.f_p.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.dfm.f_p.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.dfm.f_i.conv.weight - torch.Size([128, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDNet  
+
+backbone.dfm.f_i.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.dfm.f_i.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.conv_seg.weight - torch.Size([2, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDHead  
+
+decode_head.conv_seg.bias - torch.Size([2]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.i_head.conv.conv.weight - torch.Size([128, 128, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDHead  
+
+decode_head.i_head.conv.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.i_head.conv.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.i_head.norm.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.i_head.norm.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.p_head.conv.conv.weight - torch.Size([128, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDHead  
+
+decode_head.p_head.conv.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.p_head.conv.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.p_head.norm.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.p_head.norm.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.d_head.conv.conv.weight - torch.Size([32, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in PIDHead  
+
+decode_head.d_head.conv.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.d_head.conv.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.d_head.norm.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.d_head.norm.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.p_cls_seg.weight - torch.Size([2, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDHead  
+
+decode_head.p_cls_seg.bias - torch.Size([2]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.d_cls_seg.weight - torch.Size([1, 32, 1, 1]): 
+Initialized by user-defined `init_weights` in PIDHead  
+
+decode_head.d_cls_seg.bias - torch.Size([1]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+2023/05/11 10:20:11 - mmengine - WARNING - "FileClient" will be deprecated in future. Please use io functions in https://mmengine.readthedocs.io/en/latest/api/fileio.html#file-io
+2023/05/11 10:20:11 - mmengine - WARNING - "HardDiskBackend" is the alias of "LocalBackend" and the former will be deprecated in future.
+2023/05/11 10:20:11 - mmengine - INFO - Checkpoints will be saved to /kaggle/working.
+2023/05/11 10:21:08 - mmengine - INFO - Iter(train) [  50/1500]  lr: 9.7053e-03  eta: 0:27:40  time: 1.5389  data_time: 1.2797  memory: 10793  loss: 1.9240  decode.loss_sem_p: 0.1300  decode.loss_sem_i: 0.8174  decode.loss_bd: 0.1334  decode.loss_sem_bd: 0.8432  decode.acc_seg: 58.4813
+2023/05/11 10:21:54 - mmengine - INFO - Iter(train) [ 100/1500]  lr: 9.4036e-03  eta: 0:24:02  time: 1.1438  data_time: 0.8682  memory: 2887  loss: 1.3212  decode.loss_sem_p: 0.0474  decode.loss_sem_i: 0.4989  decode.loss_bd: 0.1116  decode.loss_sem_bd: 0.6633  decode.acc_seg: 88.0873
+2023/05/11 10:22:35 - mmengine - INFO - Iter(train) [ 150/1500]  lr: 9.1008e-03  eta: 0:21:40  time: 0.8204  data_time: 0.5407  memory: 2889  loss: 1.4577  decode.loss_sem_p: 0.0569  decode.loss_sem_i: 0.6560  decode.loss_bd: 0.1266  decode.loss_sem_bd: 0.6183  decode.acc_seg: 79.4621
+2023/05/11 10:23:18 - mmengine - INFO - Iter(train) [ 200/1500]  lr: 8.7969e-03  eta: 0:20:16  time: 0.7208  data_time: 0.4246  memory: 2887  loss: 1.3345  decode.loss_sem_p: 0.0622  decode.loss_sem_i: 0.5733  decode.loss_bd: 0.1147  decode.loss_sem_bd: 0.5842  decode.acc_seg: 71.4406
+2023/05/11 10:24:02 - mmengine - INFO - Iter(train) [ 250/1500]  lr: 8.4918e-03  eta: 0:19:13  time: 0.5737  data_time: 0.3224  memory: 2887  loss: 1.3916  decode.loss_sem_p: 0.0532  decode.loss_sem_i: 0.6210  decode.loss_bd: 0.1008  decode.loss_sem_bd: 0.6167  decode.acc_seg: 90.4099
+2023/05/11 10:24:49 - mmengine - INFO - Iter(train) [ 300/1500]  lr: 8.1854e-03  eta: 0:18:31  time: 1.0140  data_time: 0.7566  memory: 2887  loss: 1.3834  decode.loss_sem_p: 0.0506  decode.loss_sem_i: 0.5787  decode.loss_bd: 0.1148  decode.loss_sem_bd: 0.6393  decode.acc_seg: 76.5464
+2023/05/11 10:25:39 - mmengine - INFO - Iter(train) [ 350/1500]  lr: 7.8778e-03  eta: 0:17:57  time: 1.3397  data_time: 1.0847  memory: 2887  loss: 1.2206  decode.loss_sem_p: 0.0459  decode.loss_sem_i: 0.4659  decode.loss_bd: 0.1045  decode.loss_sem_bd: 0.6044  decode.acc_seg: 60.7961
+2023/05/11 10:26:27 - mmengine - INFO - Iter(train) [ 400/1500]  lr: 7.5689e-03  eta: 0:17:15  time: 1.1175  data_time: 0.8238  memory: 2887  loss: 1.4110  decode.loss_sem_p: 0.0617  decode.loss_sem_i: 0.5681  decode.loss_bd: 0.1054  decode.loss_sem_bd: 0.6758  decode.acc_seg: 92.1258
+2023/05/11 10:27:18 - mmengine - INFO - Iter(train) [ 450/1500]  lr: 7.2585e-03  eta: 0:16:37  time: 1.0449  data_time: 0.7547  memory: 2888  loss: 1.2732  decode.loss_sem_p: 0.0536  decode.loss_sem_i: 0.5702  decode.loss_bd: 0.1147  decode.loss_sem_bd: 0.5347  decode.acc_seg: 72.2656
+2023/05/11 10:28:06 - mmengine - INFO - Iter(train) [ 500/1500]  lr: 6.9467e-03  eta: 0:15:49  time: 0.8710  data_time: 0.6134  memory: 2888  loss: 1.3911  decode.loss_sem_p: 0.0560  decode.loss_sem_i: 0.5564  decode.loss_bd: 0.1090  decode.loss_sem_bd: 0.6697  decode.acc_seg: 92.6888
+2023/05/11 10:28:48 - mmengine - INFO - Iter(train) [ 550/1500]  lr: 6.6333e-03  eta: 0:14:52  time: 0.9981  data_time: 0.7179  memory: 2887  loss: 1.3827  decode.loss_sem_p: 0.0459  decode.loss_sem_i: 0.5481  decode.loss_bd: 0.1472  decode.loss_sem_bd: 0.6415  decode.acc_seg: 90.6374
+2023/05/11 10:29:31 - mmengine - INFO - Iter(train) [ 600/1500]  lr: 6.3182e-03  eta: 0:13:59  time: 1.1223  data_time: 0.8740  memory: 2888  loss: 1.3092  decode.loss_sem_p: 0.0518  decode.loss_sem_i: 0.5321  decode.loss_bd: 0.1186  decode.loss_sem_bd: 0.6067  decode.acc_seg: 89.0595
+2023/05/11 10:30:16 - mmengine - INFO - Iter(train) [ 650/1500]  lr: 6.0014e-03  eta: 0:13:10  time: 1.1246  data_time: 0.8535  memory: 2887  loss: 1.2642  decode.loss_sem_p: 0.0527  decode.loss_sem_i: 0.5163  decode.loss_bd: 0.1132  decode.loss_sem_bd: 0.5820  decode.acc_seg: 76.8352
+2023/05/11 10:30:54 - mmengine - INFO - Iter(train) [ 700/1500]  lr: 5.6828e-03  eta: 0:12:15  time: 0.6413  data_time: 0.3755  memory: 2888  loss: 1.2039  decode.loss_sem_p: 0.0516  decode.loss_sem_i: 0.5155  decode.loss_bd: 0.1026  decode.loss_sem_bd: 0.5341  decode.acc_seg: 87.1819
+2023/05/11 10:31:40 - mmengine - INFO - Iter(train) [ 750/1500]  lr: 5.3621e-03  eta: 0:11:29  time: 1.0014  data_time: 0.7355  memory: 2889  loss: 1.3470  decode.loss_sem_p: 0.0521  decode.loss_sem_i: 0.5748  decode.loss_bd: 0.1230  decode.loss_sem_bd: 0.5970  decode.acc_seg: 64.3187
+2023/05/11 10:32:32 - mmengine - INFO - Iter(train) [ 800/1500]  lr: 5.0393e-03  eta: 0:10:48  time: 1.1704  data_time: 0.9155  memory: 2888  loss: 1.1624  decode.loss_sem_p: 0.0492  decode.loss_sem_i: 0.5509  decode.loss_bd: 0.1108  decode.loss_sem_bd: 0.4515  decode.acc_seg: 85.0996
+2023/05/11 10:33:15 - mmengine - INFO - Iter(train) [ 850/1500]  lr: 4.7141e-03  eta: 0:09:59  time: 1.0338  data_time: 0.7690  memory: 2887  loss: 1.1653  decode.loss_sem_p: 0.0503  decode.loss_sem_i: 0.4709  decode.loss_bd: 0.1052  decode.loss_sem_bd: 0.5389  decode.acc_seg: 86.2794
+2023/05/11 10:34:00 - mmengine - INFO - Iter(train) [ 900/1500]  lr: 4.3865e-03  eta: 0:09:12  time: 0.7541  data_time: 0.4491  memory: 2887  loss: 1.1642  decode.loss_sem_p: 0.0473  decode.loss_sem_i: 0.4689  decode.loss_bd: 0.1130  decode.loss_sem_bd: 0.5350  decode.acc_seg: 84.2569
+2023/05/11 10:34:46 - mmengine - INFO - Iter(train) [ 950/1500]  lr: 4.0561e-03  eta: 0:08:26  time: 0.9649  data_time: 0.7001  memory: 2888  loss: 1.2325  decode.loss_sem_p: 0.0526  decode.loss_sem_i: 0.4327  decode.loss_bd: 0.1178  decode.loss_sem_bd: 0.6294  decode.acc_seg: 90.3959
+2023/05/11 10:35:32 - mmengine - INFO - Exp name: config_20230511_101932
+2023/05/11 10:35:32 - mmengine - INFO - Iter(train) [1000/1500]  lr: 3.7226e-03  eta: 0:07:40  time: 1.0250  data_time: 0.7551  memory: 2888  loss: 1.1076  decode.loss_sem_p: 0.0414  decode.loss_sem_i: 0.4192  decode.loss_bd: 0.1112  decode.loss_sem_bd: 0.5358  decode.acc_seg: 85.6007
+2023/05/11 10:36:12 - mmengine - INFO - Iter(train) [1050/1500]  lr: 3.3859e-03  eta: 0:06:51  time: 0.8263  data_time: 0.5692  memory: 2890  loss: 1.0250  decode.loss_sem_p: 0.0389  decode.loss_sem_i: 0.4696  decode.loss_bd: 0.0946  decode.loss_sem_bd: 0.4219  decode.acc_seg: 93.5419
+2023/05/11 10:36:58 - mmengine - INFO - Iter(train) [1100/1500]  lr: 3.0453e-03  eta: 0:06:06  time: 0.8943  data_time: 0.6331  memory: 2888  loss: 1.2611  decode.loss_sem_p: 0.0543  decode.loss_sem_i: 0.5099  decode.loss_bd: 0.1073  decode.loss_sem_bd: 0.5896  decode.acc_seg: 60.5745
+2023/05/11 10:37:40 - mmengine - INFO - Iter(train) [1150/1500]  lr: 2.7005e-03  eta: 0:05:19  time: 0.7787  data_time: 0.4581  memory: 2887  loss: 1.3226  decode.loss_sem_p: 0.0596  decode.loss_sem_i: 0.5684  decode.loss_bd: 0.1111  decode.loss_sem_bd: 0.5834  decode.acc_seg: 89.6261
+2023/05/11 10:38:25 - mmengine - INFO - Iter(train) [1200/1500]  lr: 2.3506e-03  eta: 0:04:33  time: 0.7919  data_time: 0.5406  memory: 2887  loss: 1.1636  decode.loss_sem_p: 0.0578  decode.loss_sem_i: 0.5876  decode.loss_bd: 0.1129  decode.loss_sem_bd: 0.4053  decode.acc_seg: 67.9706
+2023/05/11 10:39:10 - mmengine - INFO - Iter(train) [1250/1500]  lr: 1.9949e-03  eta: 0:03:47  time: 1.2324  data_time: 0.9735  memory: 2888  loss: 1.1026  decode.loss_sem_p: 0.0503  decode.loss_sem_i: 0.4721  decode.loss_bd: 0.1169  decode.loss_sem_bd: 0.4633  decode.acc_seg: 72.0335
+2023/05/11 10:39:51 - mmengine - INFO - Iter(train) [1300/1500]  lr: 1.6319e-03  eta: 0:03:01  time: 0.7209  data_time: 0.4555  memory: 2887  loss: 1.1252  decode.loss_sem_p: 0.0431  decode.loss_sem_i: 0.4396  decode.loss_bd: 0.1047  decode.loss_sem_bd: 0.5378  decode.acc_seg: 96.9604
+2023/05/11 10:40:35 - mmengine - INFO - Iter(train) [1350/1500]  lr: 1.2597e-03  eta: 0:02:16  time: 0.6841  data_time: 0.4406  memory: 2888  loss: 1.3067  decode.loss_sem_p: 0.0523  decode.loss_sem_i: 0.5774  decode.loss_bd: 0.0950  decode.loss_sem_bd: 0.5820  decode.acc_seg: 85.4807
+2023/05/11 10:41:20 - mmengine - INFO - Iter(train) [1400/1500]  lr: 8.7454e-04  eta: 0:01:30  time: 1.2003  data_time: 0.9201  memory: 2888  loss: 1.2108  decode.loss_sem_p: 0.0482  decode.loss_sem_i: 0.5168  decode.loss_bd: 0.1135  decode.loss_sem_bd: 0.5323  decode.acc_seg: 91.5607
+2023/05/11 10:42:12 - mmengine - INFO - Iter(train) [1450/1500]  lr: 4.6865e-04  eta: 0:00:45  time: 1.2253  data_time: 0.9419  memory: 2888  loss: 1.2652  decode.loss_sem_p: 0.0489  decode.loss_sem_i: 0.4605  decode.loss_bd: 0.1045  decode.loss_sem_bd: 0.6512  decode.acc_seg: 83.6639
+2023/05/11 10:42:55 - mmengine - INFO - Iter(train) [1500/1500]  lr: 0.0000e+00  eta: 0:00:00  time: 0.5994  data_time: 0.2948  memory: 2888  loss: 1.0749  decode.loss_sem_p: 0.0454  decode.loss_sem_i: 0.4632  decode.loss_bd: 0.1017  decode.loss_sem_bd: 0.4646  decode.acc_seg: 91.3675
+2023/05/11 10:42:55 - mmengine - INFO - Saving checkpoint at 1500 iterations
+2023/05/11 10:43:17 - mmengine - INFO - Iter(val) [ 50/100]    eta: 0:00:17  time: 0.0999  data_time: 0.0213  memory: 8735  
+2023/05/11 10:43:30 - mmengine - INFO - Iter(val) [100/100]    eta: 0:00:00  time: 0.1672  data_time: 0.0136  memory: 8526  
+2023/05/11 10:43:30 - mmengine - INFO - per class results:
+2023/05/11 10:43:30 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 82.39 | 89.87 |
+|    mask    | 55.26 | 72.31 |
++------------+-------+-------+
+2023/05/11 10:43:30 - mmengine - INFO - Iter(val) [100/100]    aAcc: 85.5300  mIoU: 68.8200  mAcc: 81.0900  data_time: 0.0481  time: 0.2948
+2023/05/11 10:44:08 - mmengine - INFO - Iter(test) [  50/1000]    eta: 0:10:44  time: 1.4842  data_time: 0.0767  memory: 801  
+2023/05/11 10:45:21 - mmengine - INFO - Iter(test) [ 100/1000]    eta: 0:16:01  time: 1.3933  data_time: 0.0640  memory: 8742  
+2023/05/11 10:45:54 - mmengine - INFO - Iter(test) [ 150/1000]    eta: 0:13:15  time: 0.0344  data_time: 0.0038  memory: 805  
+2023/05/11 10:45:56 - mmengine - INFO - Iter(test) [ 200/1000]    eta: 0:09:28  time: 0.0371  data_time: 0.0043  memory: 200  
+2023/05/11 10:45:58 - mmengine - INFO - Iter(test) [ 250/1000]    eta: 0:07:12  time: 0.0369  data_time: 0.0037  memory: 200  
+2023/05/11 10:46:00 - mmengine - INFO - Iter(test) [ 300/1000]    eta: 0:05:40  time: 0.0370  data_time: 0.0037  memory: 200  
+2023/05/11 10:46:02 - mmengine - INFO - Iter(test) [ 350/1000]    eta: 0:04:35  time: 0.0668  data_time: 0.0089  memory: 200  
+2023/05/11 10:46:04 - mmengine - INFO - Iter(test) [ 400/1000]    eta: 0:03:45  time: 0.0369  data_time: 0.0041  memory: 200  
+2023/05/11 10:46:13 - mmengine - INFO - Iter(test) [ 450/1000]    eta: 0:03:14  time: 0.3862  data_time: 0.0164  memory: 8514  
+2023/05/11 10:46:31 - mmengine - INFO - Iter(test) [ 500/1000]    eta: 0:02:57  time: 0.4108  data_time: 0.0137  memory: 8541  
+2023/05/11 10:46:51 - mmengine - INFO - Iter(test) [ 550/1000]    eta: 0:02:41  time: 0.2819  data_time: 0.0180  memory: 8557  
+2023/05/11 10:47:06 - mmengine - INFO - Iter(test) [ 600/1000]    eta: 0:02:21  time: 0.3277  data_time: 0.0189  memory: 279  
+2023/05/11 10:47:22 - mmengine - INFO - Iter(test) [ 650/1000]    eta: 0:02:02  time: 0.2662  data_time: 0.0184  memory: 8564  
+2023/05/11 10:47:43 - mmengine - INFO - Iter(test) [ 700/1000]    eta: 0:01:46  time: 0.4145  data_time: 0.0255  memory: 8584  
+2023/05/11 10:48:02 - mmengine - INFO - Iter(test) [ 750/1000]    eta: 0:01:29  time: 0.2785  data_time: 0.0149  memory: 8546  
+2023/05/11 10:48:19 - mmengine - INFO - Iter(test) [ 800/1000]    eta: 0:01:11  time: 0.3043  data_time: 0.0171  memory: 8508  
+2023/05/11 10:48:34 - mmengine - INFO - Iter(test) [ 850/1000]    eta: 0:00:52  time: 0.3084  data_time: 0.0196  memory: 279  
+2023/05/11 10:48:50 - mmengine - INFO - Iter(test) [ 900/1000]    eta: 0:00:35  time: 0.3033  data_time: 0.0190  memory: 279  
+2023/05/11 10:49:06 - mmengine - INFO - Iter(test) [ 950/1000]    eta: 0:00:17  time: 0.2794  data_time: 0.0127  memory: 8540  
+2023/05/11 10:49:19 - mmengine - INFO - Iter(test) [1000/1000]    eta: 0:00:00  time: 0.2426  data_time: 0.0108  memory: 8560  
+2023/05/11 10:49:19 - mmengine - WARNING - IoUMetric got empty `self.results`. Please ensure that the processed results are properly added into `self.results` in `process` method.
+2023/05/11 10:49:19 - mmengine - INFO - results are saved to /kaggle/working
+2023/05/11 10:49:19 - mmengine - INFO - Iter(test) [1000/1000]    data_time: 0.0210  time: 0.3451
