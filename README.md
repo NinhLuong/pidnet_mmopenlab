@@ -1,2 +1,2 @@
 # pidnet_mmopenlab
- Project tranning data ISIC-2018 using backbone pidnet and mmopenlab
+The ISIC-2018 data streaming project uses pidnet and mmopenlab for skin disease segmentation
